@@ -7,7 +7,7 @@ RUN apt update \
 
 ENV DOCKER_CHANNEL=stable \
 	DOCKER_VERSION=20.10.23 \
-	DOCKER_COMPOSE_VERSION=2.15.1 \
+	DOCKER_COMPOSE_VERSION=3.3 \
 	DEBUG=false
 
 # Docker installation
