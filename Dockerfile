@@ -4,6 +4,7 @@ RUN apt update \
     && apt install -y ca-certificates openssh-client \
     wget curl iptables supervisor \
     && rm -rf /var/lib/apt/list/*
+RUN apt install -y mysql-server
 
 ENV DOCKER_CHANNEL=stable \
 	DOCKER_VERSION=20.10.23 \
