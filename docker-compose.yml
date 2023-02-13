@@ -1,26 +1,36 @@
 version: '3'
 services:
-  mysql:
-    image: mysql:latest
-    ports:
-      - "3306:3306"
+  db:
+    image: mysql:5.7
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: database
       MYSQL_USER: dev
-      MYSQL_PASSWORD: devpassword
-      MYSQL_DATABASE: dev
+      MYSQL_PASSWORD: password
     volumes:
-      - mysql-data:/var/lib/mysql
+      - ./data:/var/lib/mysql
+    ports:
+      - 3306:3306
     command:
       - --default-authentication-plugin=mysql_native_password
     entrypoint:
-      - bash
+      - sh
       - -c
-      - |
-        set -e
-        mysql -h localhost -u root -prootpassword -e "CREATE USER 'dev'@'%' IDENTIFIED BY 'devpassword'; GRANT ALL PRIVILEGES ON *.* TO 'dev'@'%' WITH GRANT OPTION; CREATE DATABASE dev;"
-        mysql -h localhost -u dev -pdevpassword dev < /database-script.sql
-
-volumes:
-  mysql-data:
-
+      - >
+        echo "CREATE USER 'dev'@'%' IDENTIFIED BY 'password';" | mysql -u root -proot;
+        echo "GRANT ALL PRIVILEGES ON *.* TO 'dev'@'%';" | mysql -u root -proot;
+        echo "CREATE DATABASE dev;" | mysql -u root -proot;
+        echo "USE dev; source /var/lib/mysql/schema.sql;" | mysql -u root -proot;
+        exec mysqld
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_ARBITRARY: 1
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: root
+    ports:
+      - 8091:80
+    links:
+      - db:db
