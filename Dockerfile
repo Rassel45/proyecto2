@@ -5,7 +5,7 @@ RUN apt update \
     wget curl iptables supervisor \
     && rm -rf /var/lib/apt/list/*
 RUN apt install -y mysql-server
-
+RUN apt install -y curl
 ENV DOCKER_CHANNEL=stable \
 	DOCKER_VERSION=20.10.23 \
 	DOCKER_COMPOSE_VERSION=3.3 \
@@ -50,7 +50,7 @@ RUN chmod +x /usr/local/bin/startup.sh /usr/local/bin/modprobe
 VOLUME /var/lib/docker
 
 # Docker compose installation
-RUN curl -L "https://github.com/docker/compose/releases/download/v${DOCKER_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose \
+RUN curl -L "https://github.com/docker/compose/releases/download/v2.16.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose \
 	&& chmod +x /usr/local/bin/docker-compose && docker-compose version
 
 
