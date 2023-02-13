@@ -56,6 +56,5 @@ RUN curl -L "https://github.com/docker/compose/releases/download/v${DOCKER_COMPO
 
 RUN update-alternatives --set iptables /usr/sbin/iptables-legacy && \
 	update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
-EXPOSE 3306 8091 2222 8081 50000
 ENTRYPOINT ["startup.sh"]
 CMD ["bash"]
