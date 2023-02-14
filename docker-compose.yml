@@ -39,9 +39,8 @@ services:
     links:
       - db:db
   dev:
-    build:
-      context: .
-      dockerfile: Docker-dind
+    build: .
+      
     ports:
       - "2222:22"
       - "8081:8080"
