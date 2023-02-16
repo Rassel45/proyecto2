@@ -11,6 +11,7 @@ services:
       MYSQL_DATABASE: database
       MYSQL_USER: dev
       MYSQL_PASSWORD: password
+      MYSQL_UNIX_PORT: ""
       MYSQL_TCP_PORT: 3306
     volumes:
       - ./data:/var/lib/mysql
