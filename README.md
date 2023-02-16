@@ -1,1 +1,1 @@
-# proyecto2-M14
+# proyecto2-M14 Sergi Puerta i Pau Oliver
