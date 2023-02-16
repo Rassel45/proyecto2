@@ -23,11 +23,11 @@ services:
       - sh
       - -c
       - >
+        exec mysqld
         echo "CREATE USER 'dev'@'%' IDENTIFIED BY 'password';" | mysql -u root -proot;
         echo "GRANT ALL PRIVILEGES ON *.* TO 'dev'@'%';" | mysql -u root -proot;
         echo "CREATE DATABASE dev;" | mysql -u root -proot;
         echo "USE dev; source /var/lib/mysql/schema.sql;" | mysql -u root -proot;
-        exec mysqld
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     environment:
