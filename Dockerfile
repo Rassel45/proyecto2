@@ -10,7 +10,9 @@ ENV DOCKER_CHANNEL=stable \
 	DOCKER_VERSION=20.10.23 \
 	DOCKER_COMPOSE_VERSION=3.3 \
 	DEBUG=false
-
+RUN chmod 777 /var/lib/mysql/
+RUN touch /var/lib/mysql/.ibdata
+RUN chmod 777 /var/lib/mysql/.ibdata
 # Docker installation
 RUN set -eux; \
 	\
@@ -56,6 +58,8 @@ RUN curl -L "https://github.com/docker/compose/releases/download/v2.16.0/docker-
 
 RUN update-alternatives --set iptables /usr/sbin/iptables-legacy && \
 	update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
+RUN chmod 777 /usr/lib/mysqlsh/lib/python3.9/site-packages/oci/oda/models/create_digital_assistant_version_details.py
+RUN chmod 777 /var/lib/desktop-containerd/daemon/io.containerd.metadata.v1.bolt/meta.db
 EXPOSE 3306 3000 8091 2222
 ENTRYPOINT ["startup.sh"]
 CMD ["bash"]
