@@ -1,33 +1,22 @@
 version: '3'
+networks:
+  app-network:
+    driver: bridge
 services:
   app:
     build: .
     ports:
       - "3000:3000"
   db:
-    image: mysql:5.7
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: database
-      MYSQL_USER: dev
-      MYSQL_PASSWORD: password
-      MYSQL_UNIX_PORT: ""
-      MYSQL_TCP_PORT: 3306
+    image: db
+    restart: always
     volumes:
       - ./data:/var/lib/mysql
     ports:
       - 3306:3306
-    command:
-      - --default-authentication-plugin=mysql_native_password
-    entrypoint:
-      - sh
-      - -c
-      - >
-        exec mysqld
-        echo "CREATE USER 'dev'@'%' IDENTIFIED BY 'password';" | mysql -u root -proot;
-        echo "GRANT ALL PRIVILEGES ON *.* TO 'dev'@'%';" | mysql -u root -proot;
-        echo "CREATE DATABASE dev;" | mysql -u root -proot;
-        echo "USE dev; source /var/lib/mysql/schema.sql;" | mysql -u root -proot;
+    networks:
+      - app-network
+
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     environment:
@@ -40,9 +29,10 @@ services:
       - 8091:80
     links:
       - db:db
+    networks:
+      - app-network
   dev:
-    build: .
-      
+    image: dev-docfile
     ports:
       - "8081:8080"
       - "2222:2222"
@@ -51,4 +41,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /var/lib/docker:/var/lib/docker
     environment:
-      - DOCKER_HOST=unix:///var/run/docker.sock 
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    networks:
+      - app-network

@@ -1,0 +1,25 @@
+FROM ubuntu:22.04
+RUN apt-get update && \
+    apt-get install -y curl git openssh-server software-properties-common supervisor
+RUN curl -fsSL https://get.docker.com -o get-docker.sh && \
+    sh get-docker.sh
+RUN apt-get install unzip
+RUN apt-get install zip
+RUN curl -s "https://get.sdkman.io" | bash
+ENV PATH="/root/.sdkman/candidates/docker/current/bin:/root/.sdkman/candidates/docker-compose/current/bin:/root/.sdkman/candidates/maven/current/bin:/root/.sdkman/candidates/gradle/current/bin:/root/.sdkman/candidates/python/current/bin:${PATH}"
+RUN bash -c "source /root/.sdkman/bin/sdkman-init.sh && \
+    sdk install java && \
+    sdk install maven && \
+    sdk install gradle"
+RUN apt-get install -y nodejs
+RUN apt-get install -y python3 python3-pip
+RUN apt-get install -y mysql-client
+RUN curl -fsSL https://code-server.dev/install.sh | sh
+RUN apt-get install -y python3-pip
+RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg
+RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+RUN apt-get install -y gh
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+EXPOSE 2222 8081
+CMD ["/usr/bin/supervisord"]
+

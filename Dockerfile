@@ -10,9 +10,16 @@ ENV DOCKER_CHANNEL=stable \
 	DOCKER_VERSION=20.10.23 \
 	DOCKER_COMPOSE_VERSION=3.3 \
 	DEBUG=false
-RUN chmod 777 /var/lib/mysql/
-RUN touch /var/lib/mysql/.ibdata1
-RUN chmod 777 /var/lib/mysql/.ibdata1
+
+RUN touch /var/lib/mysql/schema.sql
+RUN service mysql start && \
+    mysql -u root -e "CREATE DATABASE dev;" && \
+    mysql -u root -e "CREATE USER 'dev'@'%' IDENTIFIED BY 'dev';" && \
+    mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'dev'@'%';" && \
+    mysql -u root dev < /var/lib/mysql/schema.sql
+
+COPY my.cnf /etc/mysql/my.cnf
+
 # Docker installation
 RUN set -eux; \
 	\
