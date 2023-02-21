@@ -186,10 +186,7 @@ VOLUME /var/lib/docker
 VOLUME /var/run/docker.sock
 
 
-EXPOSE 8081 3306 9001 443 80
-
-
-EXPOSE 2222
+EXPOSE 8081 3306 9001 443 80 2222
 
 
 COPY supervisord.conf /etc/supervisor
