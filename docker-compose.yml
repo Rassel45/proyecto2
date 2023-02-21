@@ -8,31 +8,36 @@ services:
     ports:
       - "3000:3000"
   db:
-    image: db
-    restart: always
+    image: custom-mysql
     volumes:
       - ./data:/var/lib/mysql
     ports:
       - 3306:3306
     networks:
       - app-network
-
+  apache:
+    image: php:apache
+    ports:
+      - "80:80"
+    environment:
+      - ServerName=localhost
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     environment:
       PMA_ARBITRARY: 1
-      PMA_HOST: db
-      PMA_PORT: 3306
-      PMA_USER: root
-      PMA_PASSWORD: root
+      PMA_PORT: 3306:3306
+      PMA_USER: dev
+      PMA_PASSWORD: dev
     ports:
       - 8091:80
     links:
       - db:db
+    depends_on:
+      - db
     networks:
       - app-network
   dev:
-    image: dev-docfile
+    image: dev 
     ports:
       - "8081:8080"
       - "2222:2222"

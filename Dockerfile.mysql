@@ -1,0 +1,17 @@
+FROM mysql:latest
+
+# Crear la base de dades i l'usuari
+ENV MYSQL_DATABASE dev
+ENV MYSQL_USER dev
+ENV MYSQL_PASSWORD dev_password
+ENV MYSQL_ROOT_PASSWORD root_password
+
+# Copiar els fitxers SQL amb les comandes per crear les taules
+COPY ./database/ /docker-entrypoint-initdb.d/
+
+# Assignar tots els privilegis a l'usuari dev
+RUN echo 'GRANT ALL PRIVILEGES ON *.* TO "dev"@"%" WITH GRANT OPTION;' > /docker-entrypoint-initdb.d/99-grant-privileges.sql
+
+EXPOSE 3306
+
+cmd []
