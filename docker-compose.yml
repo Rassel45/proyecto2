@@ -1,10 +1,6 @@
 version: '3'
 services:
-  app:
-    build: .
-    ports:
-      - "3000:3000"
-    db:
+  db:
     image: mysql:latest
     volumes:
      - db:/var/lib/mysql
@@ -14,7 +10,7 @@ services:
       MYSQL_ROOT_PASSWORD: dev
       MYSQL_USER: dev
       MYSQL_PASSWORD: dev
-      MYSQL_DATABASE: bbdev
+      MYSQL_DATABASE: bbdduniversitat
     ports:
       - "3306:3306"
     command: --default-authentication-plugin=mysql_native_password
@@ -23,22 +19,25 @@ services:
       interval: 3s
       timeout: 2s
       retries: 10
+
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     environment:
-      PMA_ARBITRARY: 1
-      PMA_PORT: 3306:3306
+      PMA_HOST: db
+      PMA_PORT: 3306
       PMA_USER: root
       PMA_PASSWORD: dev
     ports:
-      - 8091:80
+      - "8091:80"
     depends_on:
       - db
- jenkins:
+
+
+  jenkins:
     image: jenkins/jenkins:lts
     ports:
-      - "50000:50000"
       - "8011:8080"
+      - "50000:50000"
     volumes:
       - "home:/var/jenkins_home"
       - "/var/run/docker.sock:/var/run/docker.sock"
@@ -59,7 +58,7 @@ services:
       apt-get clean;
       rm -rf /var/lib/apt/lists/*;
       /usr/local/bin/install-plugins.sh docker-plugin workflow-aggregator github-branch-source;
-      /sbin/tini -- /usr/local/bin/jenkins.sh;
+      /sbin/tini -- /usr/local/bin/jenkins.sh;'
 volumes:
   mysql_data:
   jenkins_data:
