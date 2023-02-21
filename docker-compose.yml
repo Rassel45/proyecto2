@@ -1,51 +1,67 @@
 version: '3'
-networks:
-  app-network:
-    driver: bridge
 services:
   app:
     build: .
     ports:
       - "3000:3000"
-  db:
-    image: custom-mysql
+    db:
+    image: mysql:latest
     volumes:
-      - ./data:/var/lib/mysql
-    ports:
-      - 3306:3306
-    networks:
-      - app-network
-  apache:
-    image: php:apache
-    ports:
-      - "80:80"
+     - db:/var/lib/mysql
+     - ./resources/sql/setup.sql:/docker-entrypoint-initdb.d
+     - /var/run/mysqld/mysqld.sock:/var/run/mysqld/mysqld.sock
     environment:
-      - ServerName=localhost
+      MYSQL_ROOT_PASSWORD: dev
+      MYSQL_USER: dev
+      MYSQL_PASSWORD: dev
+      MYSQL_DATABASE: bbdev
+    ports:
+      - "3306:3306"
+    command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: "mysqladmin ping -h localhost -u dev -p dev"
+      interval: 3s
+      timeout: 2s
+      retries: 10
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     environment:
       PMA_ARBITRARY: 1
       PMA_PORT: 3306:3306
-      PMA_USER: dev
+      PMA_USER: root
       PMA_PASSWORD: dev
     ports:
       - 8091:80
-    links:
-      - db:db
     depends_on:
       - db
-    networks:
-      - app-network
-  dev:
-    image: dev 
+ jenkins:
+    image: jenkins/jenkins:lts
     ports:
-      - "8081:8080"
-      - "2222:2222"
+      - "50000:50000"
+      - "8011:8080"
     volumes:
-      - ${HOME}:/home/dev
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /var/lib/docker:/var/lib/docker
+      - "home:/var/jenkins_home"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./jenkins:/var/jenkins_conf"
     environment:
-      - DOCKER_HOST=unix:///var/run/docker.sock
-    networks:
-      - app-network
+      JAVA_OPTS: "-Djenkins.install.runSetupWizard=false"
+      JENKINS_OPTS: "--prefix=/jenkins"
+      TZ: "Europe/Madrid"
+    user: root
+    depends_on:
+      - db
+    command: >
+      /bin/sh -c '
+      curl -L https://get.docker.com | sh;
+      usermod -aG docker jenkins;
+      apt-get update;
+      apt-get install -y maven gradle curl unzip;
+      apt-get clean;
+      rm -rf /var/lib/apt/lists/*;
+      /usr/local/bin/install-plugins.sh docker-plugin workflow-aggregator github-branch-source;
+      /sbin/tini -- /usr/local/bin/jenkins.sh;
+volumes:
+  mysql_data:
+  jenkins_data:
+  home:
+  db:
