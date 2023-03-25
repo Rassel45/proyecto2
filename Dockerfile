@@ -160,10 +160,10 @@ RUN apt-get update && apt-get install -y docker-ce-cli
 RUN apt-get update && apt-get install -y mysql-client
 
 #Mysql conf
-ENV MYSQL_ROOT_PASSWORD=r45
+ENV MYSQL_ROOT_PASSWORD=dev
 ENV MYSQL_DATABASE=bbdev
 ENV MYSQL_USER=dev
-ENV MYSQL_PASSWORD=dev_password
+ENV MYSQL_PASSWORD=dev
 
 
 COPY startup.sh /usr/local/bin/
