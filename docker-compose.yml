@@ -10,7 +10,7 @@ services:
       MYSQL_ROOT_PASSWORD: dev
       MYSQL_USER: dev
       MYSQL_PASSWORD: dev
-      MYSQL_DATABASE: bbdduniversitat
+      MYSQL_DATABASE: db
     ports:
       - "3306:3306"
     command: --default-authentication-plugin=mysql_native_password
