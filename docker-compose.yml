@@ -23,7 +23,7 @@ services:
       - 8091:80
   dev:
     build:
-      context: /workspaces/proyecto2-M14/DockerFile
+      context: ./DockerFile
     ports:
       - 8081:8080
       - 2222:22
