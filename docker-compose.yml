@@ -1,7 +1,7 @@
 version: '3'
 services:
   db:
-    image: mysql:latest
+    image: mariadb:latest
     volumes:
      - db:/var/lib/mysql
      - ./resources/sql/setup.sql:/docker-entrypoint-initdb.d
@@ -14,25 +14,17 @@ services:
     ports:
       - "3306:3306"
     command: --default-authentication-plugin=mysql_native_password
-    healthcheck:
-      test: "mysqladmin ping -h localhost -u dev -p dev"
-      interval: 5s
-      timeout: 3s
-      retries: 5
-
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     environment:
       PMA_HOST: db
       PMA_PORT: 3306
-      PMA_USER: root
+      PMA_USER: dev
       PMA_PASSWORD: dev
     ports:
       - "8091:80"
     depends_on:
       - db
-
-
   jenkins:
     image: jenkins/jenkins:lts
     ports:
