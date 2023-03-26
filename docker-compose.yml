@@ -25,6 +25,7 @@ services:
       - "8091:80"
     depends_on:
       - db
+    
   jenkins:
     image: jenkins/jenkins:lts
     ports:
@@ -38,7 +39,7 @@ services:
       JAVA_OPTS: "-Djenkins.install.runSetupWizard=false"
       JENKINS_OPTS: "--prefix=/jenkins"
       TZ: "Europe/Madrid"
-    user: root
+    user: dev
     depends_on:
       - db
     command: >

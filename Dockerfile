@@ -1,10 +1,4 @@
 FROM orboan/dind
-MAINTAINER Pau España y Alejandro Rodriguez
-
-LABEL version="1.0"
-LABEL description="Proyecto 2"
-
-ARG language=ca_ES
 
 ENV \
     USER=alumne \
@@ -170,10 +164,8 @@ RUN apt-get update && apt-get install -y docker-ce-cli
 RUN apt-get update && apt-get install -y mysql-client
 
 #Variables de entorno mysql
-ENV MYSQL_ROOT_PASSWORD=paulejo
-ENV MYSQL_DATABASE=bbdduniversitat
 ENV MYSQL_USER=dev
-ENV MYSQL_PASSWORD=dev_password
+ENV MYSQL_PASSWORD=dev
 
 #Copiar startup.sh
 COPY startup.sh /usr/local/bin/
