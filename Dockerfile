@@ -3,7 +3,6 @@ from ubuntu:22:04
 RUN \
     apt update \
     && apt install -y ca-certificates openssh-client \
-    wget curl iptables \
     npm \
     supervisor \
     maven \
@@ -12,9 +11,11 @@ RUN \
     gradle \
     nodejs \
     curl \
+    wget curl iptables \
     git \
     python3 \
     python3-pip \
+    mysql-client \
     && apt upgrade -y && curl -s "https://get.sdkman.io" | bash \
     && apt install docker-compose -y \
     && apt clean \
@@ -22,7 +23,7 @@ RUN \
 
 RUN useradd -ms /bin/bash dev
 
-COPY startup.xh /bin/
+COPY startup.sh /bin/
 COPY modprobe /bin/
 
 RUN chmod +X /bin/startup.sh /bin/modprobe
