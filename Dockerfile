@@ -1,4 +1,11 @@
 FROM orboan/dind
+MAINTAINER Pau España y Alejandro Rodriguez
+
+LABEL version="1.0"
+LABEL description="Proyecto 2"
+
+ARG language=ca_ES
+
 ENV \
     USER=alumne \
     PASSWORD=alumne \
@@ -20,16 +27,18 @@ ENV \
     MYSQL_PASSWORD="$PASSWORD"
 
     
-#layer cleanup script
+# Layer cleanup script
 COPY resources/scripts/*.sh  /usr/bin/
 RUN chmod +x usr/bin/*.sh
 
 
+# Make folders
 RUN \
     mkdir -p $RESOURCES_PATH && chmod a+rwx $RESOURCES_PATH && \
     mkdir -p $SSL_RESOURCES_PATH && chmod a+rwx $SSL_RESOURCES_PATH && \
     mkdir -p /etc/supervisor /var/lock/apache2 /var/run/apache2 /var/run/sshd /var/log/supervisor /var/logs /var/run/supervisor
 
+## locales
 RUN \
     if [ "$language" != "en_US" ]; then \
         apt-get -y update; \
@@ -41,6 +50,7 @@ RUN \
     fi \
     && clean-layer.sh
 
+#Instalacion basica
 RUN \
   apt update -y && \
   if ! which gpg; then \
@@ -49,7 +59,7 @@ RUN \
   clean-layer.sh
 
 
-#Program install
+#Instalación de programas
 RUN \ 
   apt update -y && \ 
   DEBIAN_FRONTEND=noninteractive \
@@ -88,7 +98,7 @@ RUN \
     clean-layer.sh
 
 
-#We install the services needed
+#Instalacion de las dependencias necessarias
 RUN apt-get update && apt-get install -y \
     supervisor \
     openssh-server \
@@ -105,18 +115,18 @@ RUN apt-get update && apt-get install -y \
     maven \
     gradle
 
-# SSH conf
+# Configurem SSH
 RUN mkdir /var/run/sshd \ 
 RUN echo 'root:root' | chpasswd 
 RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config 
 
-# SSH login conf
+# SSH login fix. Otherwise user is kicked off after login
 RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
 
 ENV NOTVISIBLE "in users profile"
 RUN echo "export VISIBLE=now" >> /etc/profile
 
-#Install VS Code
+#Descargar VS Code versión web
 RUN apt-get update && apt-get install -y curl gpg
 RUN curl https://code.visualstudio.com/docs/?dv=linux64_deb && \
     install -o root -g root -m 644 microsoft.gpg /etc/apt/trusted.gpg.d/ && \
@@ -127,7 +137,7 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 RUN curl -fsSL https://code-server.dev/install.sh | sh
 
 
-# install Github and Gitlab
+# Instalar Git y las CLI de Github y Gitlab
 RUN apt-get update && apt-get install -y git && \
     curl -LJO https://github.com/github/hub/releases/download/v2.14.2/hub-linux-amd64-2.14.2.tgz && \
     tar xvzf hub-linux-amd64-2.14.2.tgz && \
@@ -138,61 +148,66 @@ RUN apt-get update && apt-get install -y git && \
     rm hub-linux-amd64-2.14.2.tgz
 
 
-# Install OpenSSL
+# Instalar OpenSSL
 RUN apt-get update && apt-get install -y openssl
 
-# Install Python 3 and pip
+# Instalamos Python 3 y pip
 RUN apt-get update && apt-get install -y python3 python3-pip
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Install Nodejs and npm
+# Instalamos Node.js y npm
 RUN apt-get install -y nodejs && \
     apt-get install -y npm
 
-# Install Docker client
+# Instalamos el cliente de Docker
 RUN apt-get update && apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
 RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
 RUN add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 RUN apt-get update && apt-get install -y docker-ce-cli
 
 
-# Install el MySQL client
+# Instalamos el cliente de MySQL
 RUN apt-get update && apt-get install -y mysql-client
 
-#Mysql conf
-ENV MYSQL_ROOT_PASSWORD=dev
-ENV MYSQL_DATABASE=bbdev
+#Variables de entorno mysql
+ENV MYSQL_ROOT_PASSWORD=paulejo
+ENV MYSQL_DATABASE=bbdduniversitat
 ENV MYSQL_USER=dev
-ENV MYSQL_PASSWORD=dev
+ENV MYSQL_PASSWORD=dev_password
 
-
+#Copiar startup.sh
 COPY startup.sh /usr/local/bin/
 
+#Copiar logger.sh
 COPY logger.sh /opt/bash-utils/logger.sh 
 
-# Install Maven
+# Instalamos Maven CLI
 RUN apt-get update && apt-get install -y maven
 
-# Install Gradle
+# Instalamos Gradle CLI
 RUN apt-get update && apt-get install -y gradle
 
-
+# Creamos un volumen para el directorio $HOME del usuario dev
 VOLUME /home/dev
 
-
+# Creamos un volumen para /var/lib/docker
 VOLUME /var/lib/docker
 
-
+# Creamos un volumen para el socket de Docker
 VOLUME /var/run/docker.sock
 
+# Exponemos los puertos
+EXPOSE 8081 3306 9001 443 80
 
-EXPOSE 8081 3306 9001 443 80 2222
+# Configurem SSH
+EXPOSE 2222
 
-
+# Copiamos el archivo de configuración de supervisor
 COPY supervisord.conf /etc/supervisor
 RUN chmod +x /usr/local/bin/startup.sh /usr/local/bin/modprobe
 COPY docker-compose.yml /etc/docker-compose
 
 CMD ["/usr/sbin/sddd", "-D"]
 CMD ["/usr/local/bin/startup.sh"]
+
 CMD ["tail", "-f", "/dev/null"]
