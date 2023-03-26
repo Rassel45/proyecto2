@@ -1,4 +1,4 @@
-version: '3'
+version: '3.7'
 services:
   db:
     image: mariadb:latest
@@ -36,7 +36,7 @@ services:
       - 8011:8080
       - 50000:50000
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
+      - /var/run/docker.sock:/var/run/docker.sock
     environment:
       -Djenkins.install.runSetupWizard=false
     command: /usr/local/bin/jenkins.sh
