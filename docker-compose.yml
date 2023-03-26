@@ -22,8 +22,7 @@ services:
     ports:
       - 8091:80
   dev:
-    build:
-      context: ./DockerFile
+    build: ./DockerFile
     ports:
       - 8081:8080
       - 2222:22
