@@ -1,0 +1,49 @@
+version: '3.7'
+services:
+  db:
+    image: mariadb:latest
+    volumes:
+     - /var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: dev
+      MYSQL_USER: dev
+      MYSQL_PASSWORD: dev
+    ports:
+      - 3306:3306
+    command: --default-authentication-plugin=mysql_native_password
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    environment:
+      PMA_ARBITRARY: 1
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: dev
+    ports:
+      - 8091:80
+  dev:
+    build: 
+      context: ./Dockerfile
+    ports:
+      - 8081:8080
+      - 2222:22
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker:/var/lib/docker    
+  jenkins:
+    image: jenkins/jenkins:lts-jdk11
+    ports:
+      - 8011:8080
+      - 50000:50000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - Djenkins.install.runSetupWizard=false
+    command: /usr/local/bin/jenkins.sh
+      --httpPort=80
+      --javahome=/usr/java/
+      --httpListenAddress=0.0.0.0
+      --ajp13ListenAddress=0.0.0.0
+      --prefix=devops
+      --argumentsRealm.global.roles=anonymous
+      --disable-cli
