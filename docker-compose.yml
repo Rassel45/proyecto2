@@ -15,15 +15,15 @@ services:
     image: phpmyadmin/phpmyadmin:latest
     environment:
       PMA_ARBITRARY: 1
-      PMA_HOST: mysql
+      PMA_HOST: db
       PMA_PORT: 3306
-      PMA_USER: root
+      PMA_USER: dev
       PMA_PASSWORD: dev
     ports:
       - 8091:80
   dev:
     build:
-      context: ./Dockerfile
+      context: .
     ports:
       - 8081:8080
       - 2222:22
